@@ -119,7 +119,6 @@ namespace AwayFromKeyboard.Test
                 },
                 new TouchpointNameChanged()
                 {
-                    Id = touchpointId,
                     Name = "TestTouchpointRenamed"
                 }
             });
