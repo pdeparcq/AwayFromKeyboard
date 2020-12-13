@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AwayFromKeyboard.Test", "Aw
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwayFromKeyboard.Domain", "AwayFromKeyboard.Domain\AwayFromKeyboard.Domain.csproj", "{7CF4BFE6-2BDC-49FF-AC06-1C7CA0884713}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwayFromKeyboard.Web", "AwayFromKeyboard.Web\AwayFromKeyboard.Web.csproj", "{9DBFEBA2-25F1-4680-868F-45141043B7FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7CF4BFE6-2BDC-49FF-AC06-1C7CA0884713}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CF4BFE6-2BDC-49FF-AC06-1C7CA0884713}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CF4BFE6-2BDC-49FF-AC06-1C7CA0884713}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DBFEBA2-25F1-4680-868F-45141043B7FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DBFEBA2-25F1-4680-868F-45141043B7FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DBFEBA2-25F1-4680-868F-45141043B7FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DBFEBA2-25F1-4680-868F-45141043B7FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

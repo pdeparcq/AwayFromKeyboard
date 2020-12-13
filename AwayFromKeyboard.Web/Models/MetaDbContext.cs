@@ -1,10 +1,15 @@
-﻿using AwayFromKeyboard.Domain.Meta;
+﻿using System;
+using AwayFromKeyboard.Domain.Meta;
 using Microsoft.EntityFrameworkCore;
 
-namespace AwayFromKeyboard.Test
+namespace AwayFromKeyboard.Web.Models
 {
     public class MetaDbContext : DbContext
     {
+
+        public MetaDbContext()
+        {
+        }
 
         public MetaDbContext(DbContextOptions<MetaDbContext> options) : base(options)
         {
@@ -50,13 +55,21 @@ namespace AwayFromKeyboard.Test
                 .HasOne(e => e.Identity)
                 .WithMany()
                 .HasForeignKey(e => e.IdentityId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Entity>()
                 .HasMany(e => e.Relations)
                 .WithOne(r => r.FromEntity)
                 .HasForeignKey(r => r.FromEntityId)
                 .IsRequired();
+
+            modelBuilder.Entity<AggregateRoot>()
+                .HasMany(a => a.DomainEvents)
+                .WithOne(e => e.AggregateRoot)
+                .HasForeignKey(e => e.AggregateRootId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<EntityRelation>()
                 .HasKey(r => new
@@ -70,7 +83,8 @@ namespace AwayFromKeyboard.Test
                 .HasOne(r => r.ToEntity)
                 .WithMany()
                 .HasForeignKey(r => r.ToEntityId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
