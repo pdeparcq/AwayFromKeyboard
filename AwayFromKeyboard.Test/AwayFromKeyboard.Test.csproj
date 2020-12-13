@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AwayFromKeyboard.Domain\AwayFromKeyboard.Domain.csproj" />
-    <ProjectReference Include="..\AwayFromKeyboard.Web\AwayFromKeyboard.Web.csproj" />
   </ItemGroup>
 
 </Project>
