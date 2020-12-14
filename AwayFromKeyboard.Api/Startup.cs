@@ -1,3 +1,5 @@
+using AutoMapper;
+using AwayFromKeyboard.Api.ViewModels;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +28,8 @@ namespace AwayFromKeyboard.Api
 
             services.AddSwaggerGen();
             services.AddSwaggerGenNewtonsoftSupport();
+
+            services.AddAutoMapper(typeof(MetaMappingProfile));
 
             services.AddDbContext<MetaDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("MetaDb")));
         }
