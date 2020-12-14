@@ -16,6 +16,7 @@ namespace AwayFromKeyboard.Domain.Meta
         public string Name { get; set; }
         public string Description { get; set; }
         public bool IsCollection { get; set; }
+        public bool IsIdentity { get; set; }
         public SystemType? SystemType { get; set; }
         public Guid? ValueTypeId { get; set; }
         public ValueObject ValueType { get; set; }

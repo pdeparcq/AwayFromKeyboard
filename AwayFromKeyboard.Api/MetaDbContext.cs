@@ -46,13 +46,6 @@ namespace AwayFromKeyboard.Api
                 .IsRequired(false);
 
             modelBuilder.Entity<Entity>()
-                .HasOne(e => e.Identity)
-                .WithMany()
-                .HasForeignKey(e => e.IdentityId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<Entity>()
                 .HasMany(e => e.Relations)
                 .WithOne(r => r.FromEntity)
                 .HasForeignKey(r => r.FromEntityId)
