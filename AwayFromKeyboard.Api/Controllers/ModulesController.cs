@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using AwayFromKeyboard.Api.Commands;
+using AwayFromKeyboard.Api.InputModels;
 using AwayFromKeyboard.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +25,9 @@ namespace AwayFromKeyboard.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<Module>> Get()
         {
-            return _mapper.Map<IEnumerable<Module>>(await _metaDbContext.Modules.Include(m => m.SubModules)
+            return _mapper.Map<IEnumerable<Module>>(await _metaDbContext.Modules
+                .Include(m => m.SubModules)
+                .Include(m => m.Entities)
                 .Where(m => m.ParentModule == null)
                 .ToListAsync());
         }

@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace AwayFromKeyboard.Api.Commands
+namespace AwayFromKeyboard.Api.InputModels
 {
-    public class CreateModule
+    public class CreateEntity
     {
+        public Guid ModuleId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public Guid? ParentModuleId { get; set; }
     }
 }
