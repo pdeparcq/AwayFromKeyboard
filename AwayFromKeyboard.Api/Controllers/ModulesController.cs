@@ -28,6 +28,7 @@ namespace AwayFromKeyboard.Api.Controllers
             return _mapper.Map<IEnumerable<Module>>(await _metaDbContext.Modules
                 .Include(m => m.ValueObjects)
                 .Include(m => m.Entities)
+                .ThenInclude(e => e.DomainEvents)
                 .Where(m => m.ParentModule == null)
                 .ToListAsync());
         }

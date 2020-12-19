@@ -11,7 +11,6 @@ namespace AwayFromKeyboard.Api
 
         public DbSet<Module> Modules { get; set; }
         public DbSet<BaseType> Types { get; set; }
-        public DbSet<AggregateRoot> AggregateRoots { get; set; }
         public DbSet<Entity> Entities { get; set; }
         public DbSet<ValueObject> ValueObjects { get; set; }
         public DbSet<EntityRelation> EntityRelations { get; set; }
@@ -51,9 +50,9 @@ namespace AwayFromKeyboard.Api
                 .HasForeignKey(r => r.FromEntityId)
                 .IsRequired();
 
-            modelBuilder.Entity<AggregateRoot>()
-                .HasMany(a => a.DomainEvents)
-                .WithOne(e => e.AggregateRoot)
+            modelBuilder.Entity<Entity>()
+                .HasMany(e => e.DomainEvents)
+                .WithOne(de => de.AggregateRoot)
                 .HasForeignKey(e => e.AggregateRootId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.NoAction);

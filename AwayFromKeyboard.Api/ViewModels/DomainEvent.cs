@@ -2,7 +2,11 @@
 
 namespace AwayFromKeyboard.Api.ViewModels
 {
-    public class EntityDetails : Entity
+    public class DomainEvent : BaseType
+    {
+    }
+
+    public class DomainEventDetails : BaseType
     {
         public List<Property> Properties { get; set; }
     }

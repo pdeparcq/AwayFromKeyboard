@@ -27,7 +27,7 @@ namespace AwayFromKeyboard.Api.Controllers
         public async Task<ValueObjectDetails> GetDetails(Guid id)
         {
             return _mapper.Map<ValueObjectDetails>(await _metaDbContext.ValueObjects
-                .Include(e => e.Properties)
+                .Include(e => e.Properties).ThenInclude(p => p.ValueType)
                 .SingleAsync(e => e.Id == id));
         }
 

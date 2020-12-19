@@ -27,7 +27,8 @@ namespace AwayFromKeyboard.Api.Controllers
         public async Task<EntityDetails> GetDetails(Guid id)
         {
             return _mapper.Map<EntityDetails>(await _metaDbContext.Entities
-                .Include(e => e.Properties)
+                .Include(e => e.Properties).ThenInclude(p => p.ValueType)
+                .Include(e => e.DomainEvents)
                 .SingleAsync(e => e.Id == id));
         }
 

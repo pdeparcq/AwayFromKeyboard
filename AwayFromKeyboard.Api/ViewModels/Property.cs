@@ -1,5 +1,4 @@
-﻿using System;
-using AwayFromKeyboard.Domain.Meta;
+﻿using AwayFromKeyboard.Domain.Meta;
 
 namespace AwayFromKeyboard.Api.ViewModels
 {
@@ -10,6 +9,6 @@ namespace AwayFromKeyboard.Api.ViewModels
         public bool IsCollection { get; set; }
         public bool IsIdentity { get; set; }
         public SystemType? SystemType { get; set; }
-        public Guid? ValueTypeId { get; set; }
+        public ValueObject ValueType { get; set; }
     }
 }
