@@ -6,6 +6,8 @@ using AwayFromKeyboard.Api.InputModels;
 using AwayFromKeyboard.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using DomainEvent = AwayFromKeyboard.Domain.Meta.DomainEvent;
+using Entity = AwayFromKeyboard.Api.ViewModels.Entity;
 using Property = AwayFromKeyboard.Domain.Meta.Property;
 
 namespace AwayFromKeyboard.Api.Controllers
@@ -70,6 +72,22 @@ namespace AwayFromKeyboard.Api.Controllers
         {
             var entity = await _metaDbContext.Entities.Include(e => e.Properties).SingleAsync(e => e.Id == id);
             entity.Properties.Remove(entity.Properties.Single(p => p.Name == name));
+            await _metaDbContext.SaveChangesAsync();
+        }
+
+        [HttpPut]
+        [Route("{id}/domainEvents")]
+        public async Task AddDomainEvent(Guid id, [FromBody] AddDomainEvent model)
+        {
+            var entity = await _metaDbContext.Entities.Include(e => e.DomainEvents).SingleAsync(e => e.Id == id);
+
+            entity.DomainEvents.Add(new DomainEvent()
+            {
+                ModuleId = entity.ModuleId,
+                AggregateRootId = entity.Id,
+                Name = model.Name,
+                Description = model.Description
+            });
             await _metaDbContext.SaveChangesAsync();
         }
 

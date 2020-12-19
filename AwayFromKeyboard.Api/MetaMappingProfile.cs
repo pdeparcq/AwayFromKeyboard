@@ -13,6 +13,8 @@ namespace AwayFromKeyboard.Api
             CreateMap<Domain.Meta.ValueObject, ValueObjectDetails>();
             CreateMap<Domain.Meta.Entity, Entity>();
             CreateMap<Domain.Meta.Entity, EntityDetails>();
+            CreateMap<Domain.Meta.DomainEvent, DomainEvent>();
+            CreateMap<Domain.Meta.DomainEvent, DomainEventDetails>();
         }
     }
 }

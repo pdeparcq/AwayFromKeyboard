@@ -13,6 +13,7 @@ namespace AwayFromKeyboard.Api
         public DbSet<BaseType> Types { get; set; }
         public DbSet<Entity> Entities { get; set; }
         public DbSet<ValueObject> ValueObjects { get; set; }
+        public DbSet<DomainEvent> DomainEvents { get; set; }
         public DbSet<EntityRelation> EntityRelations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
