@@ -6,7 +6,7 @@ using AwayFromKeyboard.Api.InputModels;
 using AwayFromKeyboard.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Property = AwayFromKeyboard.Domain.Meta.Property;
+using Property = AwayFromKeyboard.Api.Domain.Meta.Property;
 
 namespace AwayFromKeyboard.Api.Controllers
 {

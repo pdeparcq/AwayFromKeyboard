@@ -1,4 +1,4 @@
-﻿using AwayFromKeyboard.Domain.Meta;
+﻿using AwayFromKeyboard.Api.Domain.Meta;
 
 namespace AwayFromKeyboard.Api.ViewModels
 {

@@ -3,11 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AwayFromKeyboard.Test", "AwayFromKeyboard.Test\AwayFromKeyboard.Test.csproj", "{4FFCB97E-D547-4A44-B2EA-60055F2CB735}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwayFromKeyboard.Domain", "AwayFromKeyboard.Domain\AwayFromKeyboard.Domain.csproj", "{7CF4BFE6-2BDC-49FF-AC06-1C7CA0884713}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwayFromKeyboard.Api", "AwayFromKeyboard.Api\AwayFromKeyboard.Api.csproj", "{CA1FEA21-75E0-4BE9-B74C-67712DB520C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AwayFromKeyboard.Api", "AwayFromKeyboard.Api\AwayFromKeyboard.Api.csproj", "{CA1FEA21-75E0-4BE9-B74C-67712DB520C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,14 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4FFCB97E-D547-4A44-B2EA-60055F2CB735}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4FFCB97E-D547-4A44-B2EA-60055F2CB735}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4FFCB97E-D547-4A44-B2EA-60055F2CB735}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4FFCB97E-D547-4A44-B2EA-60055F2CB735}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7CF4BFE6-2BDC-49FF-AC06-1C7CA0884713}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7CF4BFE6-2BDC-49FF-AC06-1C7CA0884713}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7CF4BFE6-2BDC-49FF-AC06-1C7CA0884713}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7CF4BFE6-2BDC-49FF-AC06-1C7CA0884713}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CA1FEA21-75E0-4BE9-B74C-67712DB520C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CA1FEA21-75E0-4BE9-B74C-67712DB520C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA1FEA21-75E0-4BE9-B74C-67712DB520C8}.Release|Any CPU.ActiveCfg = Release|Any CPU

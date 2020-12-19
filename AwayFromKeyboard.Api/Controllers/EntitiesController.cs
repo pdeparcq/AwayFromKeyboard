@@ -6,9 +6,9 @@ using AwayFromKeyboard.Api.InputModels;
 using AwayFromKeyboard.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using DomainEvent = AwayFromKeyboard.Domain.Meta.DomainEvent;
+using DomainEvent = AwayFromKeyboard.Api.Domain.Meta.DomainEvent;
 using Entity = AwayFromKeyboard.Api.ViewModels.Entity;
-using Property = AwayFromKeyboard.Domain.Meta.Property;
+using Property = AwayFromKeyboard.Api.Domain.Meta.Property;
 
 namespace AwayFromKeyboard.Api.Controllers
 {

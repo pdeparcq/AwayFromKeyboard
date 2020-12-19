@@ -1,4 +1,4 @@
-﻿using AwayFromKeyboard.Domain.Meta;
+﻿using AwayFromKeyboard.Api.Domain.Meta;
 using Microsoft.EntityFrameworkCore;
 
 namespace AwayFromKeyboard.Api
