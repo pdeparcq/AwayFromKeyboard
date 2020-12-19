@@ -2,7 +2,7 @@
 
 namespace AwayFromKeyboard.Api.InputModels
 {
-    public class CreateEntity
+    public class CreateType
     {
         public Guid ModuleId { get; set; }
         public string Name { get; set; }

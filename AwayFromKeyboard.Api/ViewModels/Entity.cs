@@ -3,10 +3,7 @@ using System.Collections.Generic;
 
 namespace AwayFromKeyboard.Api.ViewModels
 {
-    public class Entity
+    public class Entity : BaseType
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
     }
 }

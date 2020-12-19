@@ -2,7 +2,7 @@
 
 namespace AwayFromKeyboard.Api.ViewModels
 {
-    public class EntityDetails : Entity
+    public class ValueObjectDetails : BaseType
     {
         public List<Property> Properties { get; set; }
     }

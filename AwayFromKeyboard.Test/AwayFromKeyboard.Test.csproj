@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AwayFromKeyboard.Api\AwayFromKeyboard.Api.csproj" />
     <ProjectReference Include="..\AwayFromKeyboard.Domain\AwayFromKeyboard.Domain.csproj" />
   </ItemGroup>
 

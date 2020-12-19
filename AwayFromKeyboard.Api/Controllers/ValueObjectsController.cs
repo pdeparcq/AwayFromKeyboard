@@ -11,12 +11,12 @@ using Property = AwayFromKeyboard.Domain.Meta.Property;
 namespace AwayFromKeyboard.Api.Controllers
 {
     [Route("api/[controller]")]
-    public class EntitiesController : Controller
+    public class ValueObjectsController : Controller
     {
         private readonly MetaDbContext _metaDbContext;
         private readonly IMapper _mapper;
 
-        public EntitiesController(MetaDbContext metaDbContext, IMapper mapper)
+        public ValueObjectsController(MetaDbContext metaDbContext, IMapper mapper)
         {
             _metaDbContext = metaDbContext;
             _mapper = mapper;
@@ -24,17 +24,17 @@ namespace AwayFromKeyboard.Api.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<EntityDetails> GetDetails(Guid id)
+        public async Task<ValueObjectDetails> GetDetails(Guid id)
         {
-            return _mapper.Map<EntityDetails>(await _metaDbContext.Entities
+            return _mapper.Map<ValueObjectDetails>(await _metaDbContext.ValueObjects
                 .Include(e => e.Properties)
                 .SingleAsync(e => e.Id == id));
         }
 
         [HttpPost]
-        public async Task<Entity> Create([FromBody] CreateType model)
+        public async Task<ValueObject> Create([FromBody] CreateType model)
         {
-            var entity = await _metaDbContext.Entities.AddAsync(new Domain.Meta.Entity()
+            var value = await _metaDbContext.ValueObjects.AddAsync(new Domain.Meta.ValueObject()
             {
                 Id = Guid.NewGuid(),
                 ModuleId = model.ModuleId,
@@ -42,21 +42,20 @@ namespace AwayFromKeyboard.Api.Controllers
                 Description = model.Description
             });
             await _metaDbContext.SaveChangesAsync();
-            return _mapper.Map<Entity>(entity.Entity);
+            return _mapper.Map<ValueObject>(value.Entity);
         }
 
         [HttpPut]
         [Route("{id}/properties")]
         public async Task AddProperty(Guid id, [FromBody] AddProperty model)
         {
-            var entity = await _metaDbContext.Entities.Include(e => e.Properties).SingleAsync(e => e.Id == id);
+            var value = await _metaDbContext.ValueObjects.Include(e => e.Properties).SingleAsync(e => e.Id == id);
 
-            entity.Properties.Add(new Property
+            value.Properties.Add(new Property
             {
                 Name = model.Name,
                 Description = model.Description,
                 IsCollection = model.IsCollection,
-                IsIdentity = model.IsIdentity,
                 SystemType = model.SystemType,
                 ValueTypeId = model.ValueTypeId
             });
@@ -67,7 +66,7 @@ namespace AwayFromKeyboard.Api.Controllers
         [Route("{id}/properties/{name}")]
         public async Task RemoveProperty(Guid id, string name)
         {
-            var entity = await _metaDbContext.Entities.Include(e => e.Properties).SingleAsync(e => e.Id == id);
+            var entity = await _metaDbContext.ValueObjects.Include(e => e.Properties).SingleAsync(e => e.Id == id);
             entity.Properties.Remove(entity.Properties.Single(p => p.Name == name));
             await _metaDbContext.SaveChangesAsync();
         }
@@ -76,7 +75,7 @@ namespace AwayFromKeyboard.Api.Controllers
         [Route("{id}")]
         public async Task Delete(Guid id)
         {
-            _metaDbContext.Entities.Remove(_metaDbContext.Entities.Find(id));
+            _metaDbContext.ValueObjects.Remove(_metaDbContext.ValueObjects.Find(id));
             await _metaDbContext.SaveChangesAsync();
         }
     }

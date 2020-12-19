@@ -26,7 +26,7 @@ namespace AwayFromKeyboard.Api.Controllers
         public async Task<IEnumerable<Module>> Get()
         {
             return _mapper.Map<IEnumerable<Module>>(await _metaDbContext.Modules
-                .Include(m => m.SubModules)
+                .Include(m => m.ValueObjects)
                 .Include(m => m.Entities)
                 .Where(m => m.ParentModule == null)
                 .ToListAsync());

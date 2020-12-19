@@ -3,7 +3,7 @@ using AwayFromKeyboard.Domain.Meta;
 
 namespace AwayFromKeyboard.Api.InputModels
 {
-    public class AddEntityProperty
+    public class AddProperty
     {
         public string Name { get; set; }
         public string Description { get; set; }
