@@ -1,0 +1,43 @@
+﻿@page "/"
+
+@inject IMetaClient meta
+
+<h1>Modules</h1>
+
+@if (modules == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>#Entities</th>
+                <th>#ValueObjects</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var module in modules)
+            {
+                <tr>
+                    <td>@module.Name</td>
+                    <td>@module.Description</td>
+                    <td>@module.Entities.Count()</td>
+                    <td>@module.ValueObjects.Count()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<Module> modules;
+
+    protected override async Task OnInitializedAsync()
+    {
+        modules = await meta.GetAllModules();
+    }
+}
