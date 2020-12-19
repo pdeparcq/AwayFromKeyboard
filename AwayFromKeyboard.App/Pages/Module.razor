@@ -1,0 +1,61 @@
+﻿@page "/module/{moduleId}"
+@inject IMetaClient metaClient
+
+@if (module != null)
+{
+    <h1>@module.Name</h1>
+    <p>@module.Description</p>
+
+    <h3>Entities</h3>
+    @if (module.Entities.Any())
+    {
+        <Entities Module="@module"></Entities>
+    }
+    else
+    {
+        <p>No entities yet</p>
+    }
+    <button class="btn btn-success" @onclick="@ShowAddEntity">Add Entity</button>
+    @if (showAddEntity)
+    {
+        <CreateType OnCancel="@HideAddEntity" OnConfirm="@OnAddEntity"></CreateType>
+    }
+
+    <h3>Value Objects</h3>
+    @if (module.ValueObjects.Any())
+    {
+        <ValueObjects Module="@module"></ValueObjects>
+    }
+    else
+    {
+        <p>No value objects yet</p>
+    }
+}
+
+@code {
+    [Parameter]
+    public string ModuleId { get; set; }
+
+
+    private AwayFromKeyboard.App.Module module;
+
+    private bool showAddEntity = false;
+    void ShowAddEntity() => showAddEntity = true;
+    void HideAddEntity() => showAddEntity = false;
+
+    private bool showAddValueObject = false;
+    void ShowAddValueObject() => showAddValueObject = true;
+    void HideAddValueObject() => showAddValueObject = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        module = await metaClient.GetModule(Guid.Parse(ModuleId));
+    }
+
+    async Task OnAddEntity(AwayFromKeyboard.App.CreateType model)
+    {
+        model.ModuleId = Guid.Parse(ModuleId);
+        await metaClient.AddEntity(model);
+        HideAddEntity();
+    }
+}

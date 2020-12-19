@@ -1,0 +1,43 @@
+﻿<div class="modal fade show" id="myModal" style="display:block" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <EditForm Model="@model" OnValidSubmit="@HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Type</h4>
+                    <button type="button" class="close" @onclick="@OnCancel">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Name</label>
+                        <InputText id="name" @bind-Value="model.Name" class="form-control"/>
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Description</label>
+                        <InputText id="name" @bind-Value="model.Description" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" @onclick="@OnCancel">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback<AwayFromKeyboard.App.CreateType> OnConfirm { get; set; }
+
+    private AwayFromKeyboard.App.CreateType model = new AwayFromKeyboard.App.CreateType();
+
+    private async Task HandleValidSubmit()
+    {
+        await OnConfirm.InvokeAsync(model);
+    }
+}
