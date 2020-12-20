@@ -48,7 +48,7 @@ namespace AwayFromKeyboard.Api
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Meta API V1");
+                c.SwaggerEndpoint("/AwayFromKeyboard/swagger/v1/swagger.json", "Meta API V1");
             });
 
             app.UseRouting();
