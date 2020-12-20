@@ -2,12 +2,14 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using AwayFromKeyboard.Api.Domain.Meta;
 using AwayFromKeyboard.Api.InputModels;
 using AwayFromKeyboard.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DomainEvent = AwayFromKeyboard.Api.Domain.Meta.DomainEvent;
 using Entity = AwayFromKeyboard.Api.ViewModels.Entity;
+using EntityRelation = AwayFromKeyboard.Api.Domain.Meta.EntityRelation;
 using Property = AwayFromKeyboard.Api.Domain.Meta.Property;
 
 namespace AwayFromKeyboard.Api.Controllers
@@ -30,6 +32,7 @@ namespace AwayFromKeyboard.Api.Controllers
         {
             return _mapper.Map<EntityDetails>(await _metaDbContext.Entities
                 .Include(e => e.Properties).ThenInclude(p => p.ValueType)
+                .Include(e => e.Relations).ThenInclude(p => p.ToEntity)
                 .Include(e => e.DomainEvents)
                 .SingleAsync(e => e.Id == id));
         }
@@ -88,6 +91,32 @@ namespace AwayFromKeyboard.Api.Controllers
                 Name = model.Name,
                 Description = model.Description
             });
+            await _metaDbContext.SaveChangesAsync();
+        }
+
+        [HttpPut]
+        [Route("{id}/relations")]
+        public async Task AddRelation(Guid id, [FromBody] AddRelation model)
+        {
+            var entity = await _metaDbContext.Entities.Include(e => e.Relations).SingleAsync(e => e.Id == id);
+
+            entity.Relations.Add(new EntityRelation
+            {
+                Name = model.Name,
+                Description = model.Description,
+                FromEntityId = id,
+                ToEntityId = model.ToEntityId,
+                Multiplicity = model.Multiplicity
+            });
+            await _metaDbContext.SaveChangesAsync();
+        }
+
+        [HttpDelete]
+        [Route("{id}/relations/{name}")]
+        public async Task RemoveRelation(Guid id, string name)
+        {
+            var entity = await _metaDbContext.Entities.Include(e => e.Relations).SingleAsync(e => e.Id == id);
+            entity.Relations.Remove(entity.Relations.Single(p => p.Name == name));
             await _metaDbContext.SaveChangesAsync();
         }
 

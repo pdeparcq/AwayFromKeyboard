@@ -12,5 +12,6 @@ namespace AwayFromKeyboard.Api.ViewModels
     {
         public List<Property> Properties { get; set; }
         public List<DomainEvent> DomainEvents { get; set; }
+        public List<EntityRelation> Relations { get; set; }
     }
 }
