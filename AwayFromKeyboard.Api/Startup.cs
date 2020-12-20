@@ -1,12 +1,14 @@
 using AutoMapper;
-using AwayFromKeyboard.Api.ViewModels;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Converters;
+
+[assembly: ApiController]
 
 namespace AwayFromKeyboard.Api
 {
