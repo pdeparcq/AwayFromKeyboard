@@ -34,10 +34,11 @@ namespace AwayFromKeyboard.Api
             services.AddAutoMapper(typeof(MetaMappingProfile));
 
             services.AddDbContext<MetaDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("MetaDb")));
+            services.AddDbContext<CodeGenDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("CodeGenDb")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, MetaDbContext metaDbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, MetaDbContext metaDbContext, CodeGenDbContext codeGenDbContext)
         {
             if (env.IsDevelopment())
             {
@@ -50,7 +51,7 @@ namespace AwayFromKeyboard.Api
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Meta API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "AFK API V1");
             });
 
             app.UseRouting();
@@ -63,6 +64,7 @@ namespace AwayFromKeyboard.Api
             });
 
             metaDbContext.Database.EnsureCreated();
+            codeGenDbContext.Database.EnsureCreated();
         }
     }
 }
