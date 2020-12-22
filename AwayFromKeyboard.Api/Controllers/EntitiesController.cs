@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using AwayFromKeyboard.Api.Domain.Meta;
 using AwayFromKeyboard.Api.InputModels;
 using AwayFromKeyboard.Api.ViewModels;
+using HandlebarsDotNet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DomainEvent = AwayFromKeyboard.Api.Domain.Meta.DomainEvent;
@@ -18,11 +18,13 @@ namespace AwayFromKeyboard.Api.Controllers
     public class EntitiesController : Controller
     {
         private readonly MetaDbContext _metaDbContext;
+        private readonly CodeGenDbContext _codeGenDbContext;
         private readonly IMapper _mapper;
 
-        public EntitiesController(MetaDbContext metaDbContext, IMapper mapper)
+        public EntitiesController(MetaDbContext metaDbContext, CodeGenDbContext codeGenDbContext, IMapper mapper)
         {
             _metaDbContext = metaDbContext;
+            _codeGenDbContext = codeGenDbContext;
             _mapper = mapper;
         }
 
@@ -30,11 +32,25 @@ namespace AwayFromKeyboard.Api.Controllers
         [Route("{id}")]
         public async Task<EntityDetails> GetDetails(Guid id)
         {
-            return _mapper.Map<EntityDetails>(await _metaDbContext.Entities
-                .Include(e => e.Properties).ThenInclude(p => p.ValueType)
-                .Include(e => e.Relations).ThenInclude(p => p.ToEntity)
-                .Include(e => e.DomainEvents)
-                .SingleAsync(e => e.Id == id));
+            return _mapper.Map<EntityDetails>(await GetEntity(id));
+        }
+
+        [HttpGet("{id}/generate/{templateId}")]
+        public async Task<GeneratedCode<Entity>> Generate(Guid id, Guid templateId)
+        {
+            // Get model
+            var entity = await GetEntity(id);
+
+            // Get template
+            var template = await _codeGenDbContext.Templates.FindAsync(templateId);
+
+            // Generate and return code
+            return new GeneratedCode<Entity>
+            {
+                Model = _mapper.Map<Entity>(entity),
+                Template = _mapper.Map<Template>(template),
+                Value = Handlebars.Compile(template.Value)(entity)
+            };
         }
 
         [HttpPost]
@@ -126,6 +142,15 @@ namespace AwayFromKeyboard.Api.Controllers
         {
             _metaDbContext.Entities.Remove(_metaDbContext.Entities.Find(id));
             await _metaDbContext.SaveChangesAsync();
+        }
+
+        private async Task<Domain.Meta.Entity> GetEntity(Guid id)
+        {
+            return await _metaDbContext.Entities
+                .Include(e => e.Properties).ThenInclude(p => p.ValueType)
+                .Include(e => e.Relations).ThenInclude(p => p.ToEntity)
+                .Include(e => e.DomainEvents)
+                .SingleAsync(e => e.Id == id);
         }
     }
 }

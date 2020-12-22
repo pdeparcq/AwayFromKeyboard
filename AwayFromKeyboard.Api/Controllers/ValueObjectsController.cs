@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AwayFromKeyboard.Api.InputModels;
 using AwayFromKeyboard.Api.ViewModels;
+using HandlebarsDotNet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Property = AwayFromKeyboard.Api.Domain.Meta.Property;
@@ -14,11 +15,13 @@ namespace AwayFromKeyboard.Api.Controllers
     public class ValueObjectsController : Controller
     {
         private readonly MetaDbContext _metaDbContext;
+        private readonly CodeGenDbContext _codeGenDbContext;
         private readonly IMapper _mapper;
 
-        public ValueObjectsController(MetaDbContext metaDbContext, IMapper mapper)
+        public ValueObjectsController(MetaDbContext metaDbContext, CodeGenDbContext codeGenDbContext, IMapper mapper)
         {
             _metaDbContext = metaDbContext;
+            _codeGenDbContext = codeGenDbContext;
             _mapper = mapper;
         }
 
@@ -26,9 +29,25 @@ namespace AwayFromKeyboard.Api.Controllers
         [Route("{id}")]
         public async Task<ValueObjectDetails> GetDetails(Guid id)
         {
-            return _mapper.Map<ValueObjectDetails>(await _metaDbContext.ValueObjects
-                .Include(e => e.Properties).ThenInclude(p => p.ValueType)
-                .SingleAsync(e => e.Id == id));
+            return _mapper.Map<ValueObjectDetails>(await GetValueObject(id));
+        }
+
+        [HttpGet("{id}/generate/{templateId}")]
+        public async Task<GeneratedCode<ValueObject>> Generate(Guid id, Guid templateId)
+        {
+            // Get model
+            var valueObject = await GetValueObject(id);
+
+            // Get template
+            var template = await _codeGenDbContext.Templates.FindAsync(templateId);
+
+            // Generate and return code
+            return new GeneratedCode<ValueObject>
+            {
+                Model = _mapper.Map<ValueObject>(valueObject),
+                Template = _mapper.Map<Template>(template),
+                Value = Handlebars.Compile(template.Value)(valueObject)
+            };
         }
 
         [HttpPost]
@@ -77,6 +96,13 @@ namespace AwayFromKeyboard.Api.Controllers
         {
             _metaDbContext.ValueObjects.Remove(_metaDbContext.ValueObjects.Find(id));
             await _metaDbContext.SaveChangesAsync();
+        }
+
+        private async Task<Domain.Meta.ValueObject> GetValueObject(Guid id)
+        {
+            return await _metaDbContext.ValueObjects
+                .Include(e => e.Properties).ThenInclude(p => p.ValueType)
+                .SingleAsync(e => e.Id == id);
         }
     }
 }
