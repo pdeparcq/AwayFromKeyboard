@@ -23,12 +23,18 @@ namespace AwayFromKeyboard.Api.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{metaType}")]
-        public async Task<IEnumerable<Template>> GetByMetaType(MetaType metaType)
+        [HttpGet]
+        public async Task<IEnumerable<Template>> GetByMetaType([FromQuery] MetaType metaType)
         {
             return _mapper.Map<IEnumerable<Template>>(await _codeGenDbContext.Templates
                 .Where(t => t.MetaType == metaType)
                 .ToListAsync());
+        }
+
+        [HttpGet("{id}")]
+        public async Task<Template> GetById(Guid id)
+        {
+            return _mapper.Map<Template>(await _codeGenDbContext.Templates.FindAsync(id));
         }
 
         [HttpPost]
@@ -43,6 +49,15 @@ namespace AwayFromKeyboard.Api.Controllers
             });
             _codeGenDbContext.SaveChanges();
             return _mapper.Map<Template>(template.Entity);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<Template> Update(Guid id, [FromBody] UpdateTemplate model)
+        {
+            var template = await _codeGenDbContext.Templates.FindAsync(id);
+            template.Value = model.Value;
+            _codeGenDbContext.SaveChanges();
+            return _mapper.Map<Template>(template);
         }
 
         [HttpDelete]

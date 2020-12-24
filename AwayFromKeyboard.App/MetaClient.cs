@@ -22,6 +22,24 @@ namespace AwayFromKeyboard.App
         {
             await Entities3Async(model);
         }
+
+        public async Task<Template> GetTemplate(Guid templateId)
+        {
+            return await Templates2Async(templateId);
+        }
+
+        public async Task<Template> UpdateTemplate(Guid templateId, string value)
+        {
+            return await Templates3Async(templateId, new UpdateTemplate
+            {
+                Value = value
+            });
+        }
+
+        public async Task<EntityGeneratedCode> GenerateEntityCode(Guid entityId, Guid templateId)
+        {
+            return await Generate2Async(entityId, templateId);
+        }
     }
 
     public interface IMetaClient
@@ -29,5 +47,8 @@ namespace AwayFromKeyboard.App
         Task<IEnumerable<Module>> GetAllModules();
         Task<Module> GetModule(Guid moduleId);
         Task AddEntity(CreateType model);
+        Task<Template> GetTemplate(Guid templateId);
+        Task<Template> UpdateTemplate(Guid templateId, string value);
+        Task<EntityGeneratedCode> GenerateEntityCode(Guid entityId, Guid templateId);
     }
 }

@@ -1,0 +1,45 @@
+﻿@page "/entity/{entityId}"
+
+@inject IMetaClient metaClient
+
+@if (template != null)
+{
+    <div class="row">
+        <div class="col-xl-6">
+            <RadzenTextArea @bind-Value=@templateValue Change=@OnChange Cols="80" Rows="80"/>
+        </div>
+        <div class="col-xl-6">
+            <pre>
+                <code class="cs">
+                    @generatedCode
+                </code>
+            </pre>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string EntityId { get; set; }
+
+    Template template;
+    string templateValue;
+    string generatedCode;
+
+    protected override async Task OnInitializedAsync(){
+        template = await metaClient.GetTemplate(Guid.Parse("c3888b4b-4869-4cf3-861b-869417f69ab5"));
+        templateValue = template.Value;
+        await GenerateCode();
+    }
+
+    async Task GenerateCode(){
+        var generated = await metaClient.GenerateEntityCode(Guid.Parse(EntityId), template.Id);
+        generatedCode = generated.Value;
+    }
+
+    async Task OnChange()
+    {
+        await metaClient.UpdateTemplate(template.Id, templateValue);
+        await GenerateCode();
+    }
+}
