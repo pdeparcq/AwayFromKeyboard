@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AwayFromKeyboard.Api.InputModels;
+using AwayFromKeyboard.Api.Services;
 using AwayFromKeyboard.Api.ViewModels;
 using HandlebarsDotNet;
 using Microsoft.AspNetCore.Mvc;
@@ -17,12 +18,14 @@ namespace AwayFromKeyboard.Api.Controllers
         private readonly MetaDbContext _metaDbContext;
         private readonly CodeGenDbContext _codeGenDbContext;
         private readonly IMapper _mapper;
+        private readonly ICodeGenerator _generator;
 
-        public ModulesController(MetaDbContext metaDbContext, CodeGenDbContext codeGenDbContext, IMapper mapper)
+        public ModulesController(MetaDbContext metaDbContext, CodeGenDbContext codeGenDbContext, IMapper mapper, ICodeGenerator generator)
         {
             _metaDbContext = metaDbContext;
             _codeGenDbContext = codeGenDbContext;
             _mapper = mapper;
+            _generator = generator;
         }
 
         [HttpGet]
@@ -53,7 +56,7 @@ namespace AwayFromKeyboard.Api.Controllers
             {
                 Model = _mapper.Map<Module>(module),
                 Template = _mapper.Map<Template>(template),
-                Value = Handlebars.Compile(template.Value)(module)
+                Value = _generator.GenerateCode(template, module)
             };
         }
 

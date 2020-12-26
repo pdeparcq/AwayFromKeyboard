@@ -3,8 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AwayFromKeyboard.Api.InputModels;
+using AwayFromKeyboard.Api.Services;
 using AwayFromKeyboard.Api.ViewModels;
-using HandlebarsDotNet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DomainEvent = AwayFromKeyboard.Api.Domain.Meta.DomainEvent;
@@ -20,12 +20,14 @@ namespace AwayFromKeyboard.Api.Controllers
         private readonly MetaDbContext _metaDbContext;
         private readonly CodeGenDbContext _codeGenDbContext;
         private readonly IMapper _mapper;
+        private readonly ICodeGenerator _generator;
 
-        public EntitiesController(MetaDbContext metaDbContext, CodeGenDbContext codeGenDbContext, IMapper mapper)
+        public EntitiesController(MetaDbContext metaDbContext, CodeGenDbContext codeGenDbContext, IMapper mapper, ICodeGenerator generator)
         {
             _metaDbContext = metaDbContext;
             _codeGenDbContext = codeGenDbContext;
             _mapper = mapper;
+            _generator = generator;
         }
 
         [HttpGet]
@@ -49,7 +51,7 @@ namespace AwayFromKeyboard.Api.Controllers
             {
                 Model = _mapper.Map<Entity>(entity),
                 Template = _mapper.Map<Template>(template),
-                Value = Handlebars.Compile(template.Value)(entity)
+                Value = _generator.GenerateCode(template, entity)
             };
         }
 
@@ -147,6 +149,7 @@ namespace AwayFromKeyboard.Api.Controllers
         private async Task<Domain.Meta.Entity> GetEntity(Guid id)
         {
             return await _metaDbContext.Entities
+                .Include(e => e.Module)
                 .Include(e => e.Properties).ThenInclude(p => p.ValueType)
                 .Include(e => e.Relations).ThenInclude(p => p.ToEntity)
                 .Include(e => e.DomainEvents)

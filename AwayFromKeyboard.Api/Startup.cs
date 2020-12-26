@@ -1,4 +1,5 @@
 using AutoMapper;
+using AwayFromKeyboard.Api.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,8 @@ namespace AwayFromKeyboard.Api
 
             services.AddDbContext<MetaDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("MetaDb")));
             services.AddDbContext<CodeGenDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("CodeGenDb")));
+
+            services.AddTransient<ICodeGenerator, CodeGenerator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
