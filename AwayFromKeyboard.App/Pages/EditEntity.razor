@@ -2,6 +2,7 @@
 
 @inject IMetaClient metaClient
 
+
 @if (template != null)
 {
     <div class="row">
@@ -9,11 +10,7 @@
             <RadzenTextArea @bind-Value=@templateValue Change=@OnChange Cols="80" Rows="80"/>
         </div>
         <div class="col-xl-6">
-            <pre>
-                <code class="cs">
-                    @generatedCode
-                </code>
-            </pre>
+            <CodeView Code=@generatedCode />
         </div>
     </div>
 }
