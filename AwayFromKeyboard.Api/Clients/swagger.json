@@ -1,0 +1,1883 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Swagger specification",
+    "version": "1.0.0"
+  },
+  "components": {
+    "schemas": {
+      "DomainEventsController": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Controller"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Controller": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ControllerBase"
+          },
+          {
+            "type": "object",
+            "x-abstract": true,
+            "additionalProperties": false,
+            "properties": {
+              "ViewData": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ViewDataDictionary"
+                  }
+                ]
+              },
+              "TempData": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ITempDataDictionary"
+                  }
+                ]
+              },
+              "ViewBag": {
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "ViewDataDictionary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Model": {
+            "nullable": true
+          },
+          "ModelState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelStateDictionary"
+              }
+            ]
+          },
+          "ModelMetadata": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelMetadata"
+              }
+            ]
+          },
+          "ModelExplorer": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelExplorer"
+              }
+            ]
+          },
+          "TemplateInfo": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TemplateInfo"
+              }
+            ]
+          },
+          "Item": {
+            "nullable": true
+          },
+          "Count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IsReadOnly": {
+            "type": "boolean"
+          },
+          "Keys": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "Values": {
+            "type": "array",
+            "nullable": true,
+            "items": {}
+          },
+          "Data": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {}
+          }
+        }
+      },
+      "ModelStateDictionary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Root": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelStateEntry"
+              }
+            ]
+          },
+          "MaxAllowedErrors": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "HasReachedMaxErrors": {
+            "type": "boolean"
+          },
+          "ErrorCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "Values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModelStateEntry"
+            }
+          },
+          "IsValid": {
+            "type": "boolean"
+          },
+          "ValidationState": {
+            "$ref": "#/components/schemas/ModelValidationState"
+          },
+          "Item": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelStateEntry"
+              }
+            ]
+          }
+        }
+      },
+      "ModelStateEntry": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "RawValue": {
+            "nullable": true
+          },
+          "AttemptedValue": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelErrorCollection"
+              }
+            ]
+          },
+          "ValidationState": {
+            "$ref": "#/components/schemas/ModelValidationState"
+          }
+        }
+      },
+      "ModelErrorCollection": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ModelError"
+        }
+      },
+      "ModelError": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Exception": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Exception"
+              }
+            ]
+          },
+          "ErrorMessage": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Exception": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "StackTrace": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string"
+          },
+          "InnerException": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Exception"
+              }
+            ]
+          },
+          "Source": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ModelValidationState": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Unvalidated",
+          "Invalid",
+          "Valid",
+          "Skipped"
+        ],
+        "enum": [
+          "Unvalidated",
+          "Invalid",
+          "Valid",
+          "Skipped"
+        ]
+      },
+      "ModelMetadata": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "ContainerType": {
+            "type": "string",
+            "nullable": true
+          },
+          "ContainerMetadata": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelMetadata"
+              }
+            ]
+          },
+          "MetadataKind": {
+            "$ref": "#/components/schemas/ModelMetadataKind"
+          },
+          "ModelType": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ParameterName": {
+            "type": "string",
+            "nullable": true
+          },
+          "PropertyName": {
+            "type": "string",
+            "nullable": true
+          },
+          "PropertyValidationFilter": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IPropertyValidationFilter"
+              }
+            ]
+          },
+          "HasValidators": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "ElementType": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsComplexType": {
+            "type": "boolean"
+          },
+          "IsNullableValueType": {
+            "type": "boolean"
+          },
+          "IsCollectionType": {
+            "type": "boolean"
+          },
+          "IsEnumerableType": {
+            "type": "boolean"
+          },
+          "IsReferenceOrNullableType": {
+            "type": "boolean"
+          },
+          "UnderlyingOrModelType": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ModelMetadataKind": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Type",
+          "Property",
+          "Parameter"
+        ],
+        "enum": [
+          "Type",
+          "Property",
+          "Parameter"
+        ]
+      },
+      "IPropertyValidationFilter": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "ModelExplorer": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Container": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelExplorer"
+              }
+            ]
+          },
+          "Metadata": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelMetadata"
+              }
+            ]
+          },
+          "Model": {
+            "nullable": true
+          },
+          "ModelType": {
+            "type": "string",
+            "nullable": true
+          },
+          "Properties": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/ModelExplorer"
+            }
+          }
+        }
+      },
+      "TemplateInfo": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "FormattedModelValue": {
+            "nullable": true
+          },
+          "HtmlFieldPrefix": {
+            "type": "string",
+            "nullable": true
+          },
+          "TemplateDepth": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ITempDataDictionary": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "ControllerBase": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "HttpContext": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HttpContext"
+              }
+            ]
+          },
+          "Request": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HttpRequest"
+              }
+            ]
+          },
+          "Response": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HttpResponse"
+              }
+            ]
+          },
+          "RouteData": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RouteData"
+              }
+            ]
+          },
+          "ModelState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelStateDictionary"
+              }
+            ]
+          },
+          "ControllerContext": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ControllerContext"
+              }
+            ]
+          },
+          "MetadataProvider": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IModelMetadataProvider"
+              }
+            ]
+          },
+          "ModelBinderFactory": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IModelBinderFactory"
+              }
+            ]
+          },
+          "Url": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IUrlHelper"
+              }
+            ]
+          },
+          "ObjectValidator": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IObjectModelValidator"
+              }
+            ]
+          },
+          "ProblemDetailsFactory": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ProblemDetailsFactory"
+              }
+            ]
+          },
+          "User": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ClaimsPrincipal"
+              }
+            ]
+          }
+        }
+      },
+      "HttpContext": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "HttpRequest": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "BodyReader": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PipeReader"
+              }
+            ]
+          },
+          "RouteValues": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RouteValueDictionary"
+              }
+            ]
+          }
+        }
+      },
+      "PipeReader": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "RouteValueDictionary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "_arrayStorage": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/KeyValuePairOfStringAndObject"
+            }
+          },
+          "_propertyStorage": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PropertyStorage"
+              }
+            ]
+          },
+          "Item": {
+            "nullable": true
+          },
+          "Comparer": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IEqualityComparerOfString"
+              }
+            ]
+          },
+          "Count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Keys": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "Values": {
+            "type": "array",
+            "nullable": true,
+            "items": {}
+          }
+        }
+      },
+      "KeyValuePairOfStringAndObject": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {}
+        }
+      },
+      "PropertyStorage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Value": {
+            "nullable": true
+          },
+          "Properties": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/PropertyHelper"
+            }
+          }
+        }
+      },
+      "PropertyHelper": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Property": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PropertyInfo"
+              }
+            ]
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ValueGetter": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FuncOfObjectAndObject"
+              }
+            ]
+          },
+          "ValueSetter": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ActionOfObjectAndObject"
+              }
+            ]
+          }
+        }
+      },
+      "PropertyInfo": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MemberInfo"
+          },
+          {
+            "type": "object",
+            "x-abstract": true,
+            "additionalProperties": false,
+            "properties": {
+              "MemberType": {
+                "$ref": "#/components/schemas/MemberTypes"
+              },
+              "IsSpecialName": {
+                "type": "boolean"
+              },
+              "GetMethod": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/MethodInfo"
+                  }
+                ]
+              },
+              "SetMethod": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/MethodInfo"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "MemberTypes": {
+        "type": "string",
+        "description": "",
+        "x-enumFlags": true,
+        "x-enumNames": [
+          "Constructor",
+          "Event",
+          "Field",
+          "Method",
+          "Property",
+          "TypeInfo",
+          "Custom",
+          "NestedType",
+          "All"
+        ],
+        "enum": [
+          "Constructor",
+          "Event",
+          "Field",
+          "Method",
+          "Property",
+          "TypeInfo",
+          "Custom",
+          "NestedType",
+          "All"
+        ]
+      },
+      "MethodInfo": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MethodBase"
+          },
+          {
+            "type": "object",
+            "x-abstract": true,
+            "additionalProperties": false,
+            "properties": {
+              "MemberType": {
+                "$ref": "#/components/schemas/MemberTypes"
+              },
+              "ReturnParameter": {
+                "$ref": "#/components/schemas/ParameterInfo"
+              },
+              "ReturnType": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "ParameterInfo": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Attributes": {
+            "$ref": "#/components/schemas/ParameterAttributes"
+          },
+          "Member": {
+            "$ref": "#/components/schemas/MemberInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ParameterType": {
+            "type": "string"
+          },
+          "Position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IsIn": {
+            "type": "boolean"
+          },
+          "IsLcid": {
+            "type": "boolean"
+          },
+          "IsOptional": {
+            "type": "boolean"
+          },
+          "IsOut": {
+            "type": "boolean"
+          },
+          "IsRetval": {
+            "type": "boolean"
+          },
+          "DefaultValue": {
+            "nullable": true
+          },
+          "RawDefaultValue": {
+            "nullable": true
+          },
+          "HasDefaultValue": {
+            "type": "boolean"
+          },
+          "CustomAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            }
+          },
+          "MetadataToken": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ParameterAttributes": {
+        "type": "string",
+        "description": "",
+        "x-enumFlags": true,
+        "x-enumNames": [
+          "None",
+          "In",
+          "Out",
+          "Lcid",
+          "Retval",
+          "Optional",
+          "HasDefault",
+          "HasFieldMarshal",
+          "Reserved3",
+          "Reserved4",
+          "ReservedMask"
+        ],
+        "enum": [
+          "None",
+          "In",
+          "Out",
+          "Lcid",
+          "Retval",
+          "Optional",
+          "HasDefault",
+          "HasFieldMarshal",
+          "Reserved3",
+          "Reserved4",
+          "ReservedMask"
+        ]
+      },
+      "MemberInfo": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "Module": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "CustomAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            }
+          },
+          "IsCollectible": {
+            "type": "boolean"
+          },
+          "MetadataToken": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Module": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "Assembly": {
+            "$ref": "#/components/schemas/Assembly"
+          },
+          "FullyQualifiedName": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "MDStreamVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ModuleVersionId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "ScopeName": {
+            "type": "string"
+          },
+          "ModuleHandle": {
+            "$ref": "#/components/schemas/ModuleHandle"
+          },
+          "CustomAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            }
+          },
+          "MetadataToken": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Assembly": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "DefinedTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ExportedTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "CodeBase": {
+            "type": "string",
+            "nullable": true
+          },
+          "EntryPoint": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MethodInfo"
+              }
+            ]
+          },
+          "FullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "ImageRuntimeVersion": {
+            "type": "string"
+          },
+          "IsDynamic": {
+            "type": "boolean"
+          },
+          "Location": {
+            "type": "string"
+          },
+          "ReflectionOnly": {
+            "type": "boolean"
+          },
+          "IsCollectible": {
+            "type": "boolean"
+          },
+          "IsFullyTrusted": {
+            "type": "boolean"
+          },
+          "CustomAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            }
+          },
+          "EscapedCodeBase": {
+            "type": "string"
+          },
+          "ManifestModule": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "Modules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Module"
+            }
+          },
+          "GlobalAssemblyCache": {
+            "type": "boolean"
+          },
+          "HostContext": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "SecurityRuleSet": {
+            "$ref": "#/components/schemas/SecurityRuleSet"
+          }
+        }
+      },
+      "CustomAttributeData": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "AttributeType": {
+            "type": "string"
+          },
+          "Constructor": {
+            "$ref": "#/components/schemas/ConstructorInfo"
+          },
+          "ConstructorArguments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeTypedArgument"
+            }
+          },
+          "NamedArguments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeNamedArgument"
+            }
+          }
+        }
+      },
+      "ConstructorInfo": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MethodBase"
+          },
+          {
+            "type": "object",
+            "x-abstract": true,
+            "additionalProperties": false,
+            "properties": {
+              "MemberType": {
+                "$ref": "#/components/schemas/MemberTypes"
+              }
+            }
+          }
+        ]
+      },
+      "MethodBase": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MemberInfo"
+          },
+          {
+            "type": "object",
+            "x-abstract": true,
+            "additionalProperties": false,
+            "properties": {
+              "MethodImplementationFlags": {
+                "$ref": "#/components/schemas/MethodImplAttributes"
+              },
+              "CallingConvention": {
+                "$ref": "#/components/schemas/CallingConventions"
+              },
+              "IsAbstract": {
+                "type": "boolean"
+              },
+              "IsConstructor": {
+                "type": "boolean"
+              },
+              "IsFinal": {
+                "type": "boolean"
+              },
+              "IsHideBySig": {
+                "type": "boolean"
+              },
+              "IsSpecialName": {
+                "type": "boolean"
+              },
+              "IsStatic": {
+                "type": "boolean"
+              },
+              "IsVirtual": {
+                "type": "boolean"
+              },
+              "IsAssembly": {
+                "type": "boolean"
+              },
+              "IsFamily": {
+                "type": "boolean"
+              },
+              "IsFamilyAndAssembly": {
+                "type": "boolean"
+              },
+              "IsFamilyOrAssembly": {
+                "type": "boolean"
+              },
+              "IsPrivate": {
+                "type": "boolean"
+              },
+              "IsPublic": {
+                "type": "boolean"
+              },
+              "IsConstructedGenericMethod": {
+                "type": "boolean"
+              },
+              "IsGenericMethod": {
+                "type": "boolean"
+              },
+              "IsGenericMethodDefinition": {
+                "type": "boolean"
+              },
+              "ContainsGenericParameters": {
+                "type": "boolean"
+              },
+              "IsSecurityCritical": {
+                "type": "boolean"
+              },
+              "IsSecuritySafeCritical": {
+                "type": "boolean"
+              },
+              "IsSecurityTransparent": {
+                "type": "boolean"
+              }
+            }
+          }
+        ]
+      },
+      "MethodImplAttributes": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "IL",
+          "Managed",
+          "Native",
+          "OPTIL",
+          "Runtime",
+          "CodeTypeMask",
+          "Unmanaged",
+          "ManagedMask",
+          "NoInlining",
+          "ForwardRef",
+          "Synchronized",
+          "NoOptimization",
+          "PreserveSig",
+          "AggressiveInlining",
+          "AggressiveOptimization",
+          "InternalCall",
+          "MaxMethodImplVal"
+        ],
+        "enum": [
+          "Managed",
+          "Managed",
+          "Native",
+          "OPTIL",
+          "CodeTypeMask",
+          "CodeTypeMask",
+          "Unmanaged",
+          "Unmanaged",
+          "NoInlining",
+          "ForwardRef",
+          "Synchronized",
+          "NoOptimization",
+          "PreserveSig",
+          "AggressiveInlining",
+          "AggressiveOptimization",
+          "InternalCall",
+          "MaxMethodImplVal"
+        ]
+      },
+      "CallingConventions": {
+        "type": "string",
+        "description": "",
+        "x-enumFlags": true,
+        "x-enumNames": [
+          "Standard",
+          "VarArgs",
+          "Any",
+          "HasThis",
+          "ExplicitThis"
+        ],
+        "enum": [
+          "Standard",
+          "VarArgs",
+          "Any",
+          "HasThis",
+          "ExplicitThis"
+        ]
+      },
+      "CustomAttributeTypedArgument": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ArgumentType": {
+            "type": "string"
+          },
+          "Value": {
+            "nullable": true
+          }
+        }
+      },
+      "CustomAttributeNamedArgument": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "MemberInfo": {
+            "$ref": "#/components/schemas/MemberInfo"
+          },
+          "TypedValue": {
+            "$ref": "#/components/schemas/CustomAttributeTypedArgument"
+          },
+          "MemberName": {
+            "type": "string"
+          },
+          "IsField": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SecurityRuleSet": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "Level1",
+          "Level2"
+        ],
+        "enum": [
+          "None",
+          "Level1",
+          "Level2"
+        ]
+      },
+      "ModuleHandle": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "MDStreamVersion": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "FuncOfObjectAndObject": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MulticastDelegate"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "MulticastDelegate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Delegate"
+          },
+          {
+            "type": "object",
+            "x-abstract": true,
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Delegate": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "Target": {
+            "nullable": true
+          },
+          "Method": {
+            "$ref": "#/components/schemas/MethodInfo"
+          }
+        }
+      },
+      "ActionOfObjectAndObject": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MulticastDelegate"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "IEqualityComparerOfString": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "HttpResponse": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "BodyWriter": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PipeWriter"
+              }
+            ]
+          }
+        }
+      },
+      "PipeWriter": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "RouteData": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "DataTokens": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RouteValueDictionary"
+              }
+            ]
+          },
+          "Routers": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/IRouter"
+            }
+          },
+          "Values": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RouteValueDictionary"
+              }
+            ]
+          }
+        }
+      },
+      "IRouter": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "ControllerContext": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ActionContext"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "ActionDescriptor": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ControllerActionDescriptor"
+                  }
+                ]
+              },
+              "ValueProviderFactories": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "$ref": "#/components/schemas/IValueProviderFactory"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ControllerActionDescriptor": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ActionDescriptor"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "ControllerName": {
+                "type": "string",
+                "nullable": true
+              },
+              "ActionName": {
+                "type": "string",
+                "nullable": true
+              },
+              "MethodInfo": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/MethodInfo"
+                  }
+                ]
+              },
+              "ControllerTypeInfo": {
+                "type": "string",
+                "nullable": true
+              },
+              "DisplayName": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "ActionDescriptor": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "string",
+            "nullable": true
+          },
+          "RouteValues": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "AttributeRouteInfo": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AttributeRouteInfo"
+              }
+            ]
+          },
+          "ActionConstraints": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/IActionConstraintMetadata"
+            }
+          },
+          "EndpointMetadata": {
+            "type": "array",
+            "nullable": true,
+            "items": {}
+          },
+          "Parameters": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/ParameterDescriptor"
+            }
+          },
+          "BoundProperties": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/ParameterDescriptor"
+            }
+          },
+          "FilterDescriptors": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/FilterDescriptor"
+            }
+          },
+          "DisplayName": {
+            "type": "string",
+            "nullable": true
+          },
+          "Properties": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {}
+          }
+        }
+      },
+      "AttributeRouteInfo": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Template": {
+            "type": "string",
+            "nullable": true
+          },
+          "Order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "SuppressLinkGeneration": {
+            "type": "boolean"
+          },
+          "SuppressPathMatching": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IActionConstraintMetadata": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "ParameterDescriptor": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ParameterType": {
+            "type": "string",
+            "nullable": true
+          },
+          "BindingInfo": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/BindingInfo"
+              }
+            ]
+          }
+        }
+      },
+      "BindingInfo": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "BindingSource": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/BindingSource"
+              }
+            ]
+          },
+          "BinderModelName": {
+            "type": "string",
+            "nullable": true
+          },
+          "BinderType": {
+            "type": "string",
+            "nullable": true
+          },
+          "PropertyFilterProvider": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IPropertyFilterProvider"
+              }
+            ]
+          },
+          "RequestPredicate": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FuncOfActionContextAndBoolean"
+              }
+            ]
+          }
+        }
+      },
+      "BindingSource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "DisplayName": {
+            "type": "string",
+            "nullable": true
+          },
+          "Id": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsGreedy": {
+            "type": "boolean"
+          },
+          "IsFromRequest": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IPropertyFilterProvider": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "PropertyFilter": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FuncOfModelMetadataAndBoolean"
+              }
+            ]
+          }
+        }
+      },
+      "FuncOfModelMetadataAndBoolean": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MulticastDelegate"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "FuncOfActionContextAndBoolean": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MulticastDelegate"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "FilterDescriptor": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Filter": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IFilterMetadata"
+              }
+            ]
+          },
+          "Order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Scope": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "IFilterMetadata": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "IValueProviderFactory": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "ActionContext": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ActionDescriptor": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ActionDescriptor"
+              }
+            ]
+          },
+          "HttpContext": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HttpContext"
+              }
+            ]
+          },
+          "ModelState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelStateDictionary"
+              }
+            ]
+          },
+          "RouteData": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RouteData"
+              }
+            ]
+          }
+        }
+      },
+      "IModelMetadataProvider": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "IModelBinderFactory": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "IUrlHelper": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "ActionContext": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ActionContext"
+              }
+            ]
+          }
+        }
+      },
+      "IObjectModelValidator": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "ProblemDetailsFactory": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "ClaimsPrincipal": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Claims": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/Claim"
+            }
+          },
+          "Identities": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/ClaimsIdentity"
+            }
+          },
+          "Identity": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IIdentity"
+              }
+            ]
+          }
+        }
+      },
+      "Claim": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Issuer": {
+            "type": "string",
+            "nullable": true
+          },
+          "OriginalIssuer": {
+            "type": "string",
+            "nullable": true
+          },
+          "Properties": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "Subject": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ClaimsIdentity"
+              }
+            ]
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true
+          },
+          "Value": {
+            "type": "string",
+            "nullable": true
+          },
+          "ValueType": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ClaimsIdentity": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "AuthenticationType": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsAuthenticated": {
+            "type": "boolean"
+          },
+          "Actor": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ClaimsIdentity"
+              }
+            ]
+          },
+          "BootstrapContext": {
+            "nullable": true
+          },
+          "Claims": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/Claim"
+            }
+          },
+          "Label": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "NameClaimType": {
+            "type": "string",
+            "nullable": true
+          },
+          "RoleClaimType": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "IIdentity": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "AuthenticationType": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsAuthenticated": {
+            "type": "boolean"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "EntitiesController": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Controller"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "ModulesController": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Controller"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "TemplatesController": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Controller"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "ValueObjectsController": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Controller"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  }
+}
