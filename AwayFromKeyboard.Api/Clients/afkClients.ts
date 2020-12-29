@@ -7,101 +7,124 @@
 //----------------------
 // ReSharper disable InconsistentNaming
 
-import * as ng from 'angular';
+import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 'rxjs/operators';
+import { Observable, throwError as _observableThrow, of as _observableOf } from 'rxjs';
+import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
+export module afk {
+export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
+
+@Injectable()
 export class DomainEventsClient {
-    private baseUrl: string | undefined = undefined;
-    private http: ng.IHttpService;
-    private q: ng.IQService;
+    private http: HttpClient;
+    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor($http: ng.IHttpService, $q: ng.IQService, baseUrl?: string) {
-        this.http = $http;
-        this.q = $q;
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    getDetails(id: string): ng.IPromise<DomainEventDetails | null> {
+    getDetails(id: string): Observable<DomainEventDetails | null> {
         let url_ = this.baseUrl + "/api/DomainEvents/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "GET",
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processGetDetails(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processGetDetails(_response);
-            throw _response;
-        });
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDetails(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDetails(<any>response_);
+                } catch (e) {
+                    return <Observable<DomainEventDetails | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<DomainEventDetails | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processGetDetails(response: any): ng.IPromise<DomainEventDetails | null> {
+    protected processGetDetails(response: HttpResponseBase): Observable<DomainEventDetails | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? DomainEventDetails.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<DomainEventDetails | null>(<any>null);
+        return _observableOf<DomainEventDetails | null>(<any>null);
     }
 
-    delete(id: string): ng.IPromise<void> {
+    delete(id: string): Observable<void> {
         let url_ = this.baseUrl + "/api/DomainEvents/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "DELETE",
-            transformResponse: [],
-            headers: {
-            }
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processDelete(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processDelete(_response);
-            throw _response;
-        });
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processDelete(response: any): ng.IPromise<void> {
+    protected processDelete(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 
-    generate(id: string, templateId: string): ng.IPromise<GeneratedCodeOfDomainEvent | null> {
+    generate(id: string, templateId: string): Observable<GeneratedCodeOfDomainEvent | null> {
         let url_ = this.baseUrl + "/api/DomainEvents/{id}/generate/{templateId}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -111,42 +134,51 @@ export class DomainEventsClient {
         url_ = url_.replace("{templateId}", encodeURIComponent("" + templateId));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "GET",
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processGenerate(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processGenerate(_response);
-            throw _response;
-        });
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGenerate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGenerate(<any>response_);
+                } catch (e) {
+                    return <Observable<GeneratedCodeOfDomainEvent | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<GeneratedCodeOfDomainEvent | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processGenerate(response: any): ng.IPromise<GeneratedCodeOfDomainEvent | null> {
+    protected processGenerate(response: HttpResponseBase): Observable<GeneratedCodeOfDomainEvent | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? GeneratedCodeOfDomainEvent.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<GeneratedCodeOfDomainEvent | null>(<any>null);
+        return _observableOf<GeneratedCodeOfDomainEvent | null>(<any>null);
     }
 
-    addProperty(id: string, model: AddProperty | null): ng.IPromise<void> {
+    addProperty(id: string, model: AddProperty | null): Observable<void> {
         let url_ = this.baseUrl + "/api/DomainEvents/{id}/properties";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -155,40 +187,49 @@ export class DomainEventsClient {
 
         const content_ = JSON.stringify(model);
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "PUT",
-            data: content_,
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Content-Type": "application/json",
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processAddProperty(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processAddProperty(_response);
-            throw _response;
-        });
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddProperty(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddProperty(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processAddProperty(response: any): ng.IPromise<void> {
+    protected processAddProperty(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 
-    removeProperty(id: string, name: string | null): ng.IPromise<void> {
+    removeProperty(id: string, name: string | null): Observable<void> {
         let url_ = this.baseUrl + "/api/DomainEvents/{id}/properties/{name}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -198,131 +239,157 @@ export class DomainEventsClient {
         url_ = url_.replace("{name}", encodeURIComponent("" + name));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "DELETE",
-            transformResponse: [],
-            headers: {
-            }
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processRemoveProperty(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processRemoveProperty(_response);
-            throw _response;
-        });
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemoveProperty(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemoveProperty(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processRemoveProperty(response: any): ng.IPromise<void> {
+    protected processRemoveProperty(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 }
 
+@Injectable()
 export class EntitiesClient {
-    private baseUrl: string | undefined = undefined;
-    private http: ng.IHttpService;
-    private q: ng.IQService;
+    private http: HttpClient;
+    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor($http: ng.IHttpService, $q: ng.IQService, baseUrl?: string) {
-        this.http = $http;
-        this.q = $q;
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    getDetails(id: string): ng.IPromise<EntityDetails | null> {
+    getDetails(id: string): Observable<EntityDetails | null> {
         let url_ = this.baseUrl + "/api/Entities/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "GET",
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processGetDetails(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processGetDetails(_response);
-            throw _response;
-        });
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDetails(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDetails(<any>response_);
+                } catch (e) {
+                    return <Observable<EntityDetails | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<EntityDetails | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processGetDetails(response: any): ng.IPromise<EntityDetails | null> {
+    protected processGetDetails(response: HttpResponseBase): Observable<EntityDetails | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? EntityDetails.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<EntityDetails | null>(<any>null);
+        return _observableOf<EntityDetails | null>(<any>null);
     }
 
-    delete(id: string): ng.IPromise<void> {
+    delete(id: string): Observable<void> {
         let url_ = this.baseUrl + "/api/Entities/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "DELETE",
-            transformResponse: [],
-            headers: {
-            }
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processDelete(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processDelete(_response);
-            throw _response;
-        });
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processDelete(response: any): ng.IPromise<void> {
+    protected processDelete(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 
-    generate(id: string, templateId: string): ng.IPromise<GeneratedCodeOfEntity | null> {
+    generate(id: string, templateId: string): Observable<GeneratedCodeOfEntity | null> {
         let url_ = this.baseUrl + "/api/Entities/{id}/generate/{templateId}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -332,85 +399,103 @@ export class EntitiesClient {
         url_ = url_.replace("{templateId}", encodeURIComponent("" + templateId));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "GET",
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processGenerate(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processGenerate(_response);
-            throw _response;
-        });
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGenerate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGenerate(<any>response_);
+                } catch (e) {
+                    return <Observable<GeneratedCodeOfEntity | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<GeneratedCodeOfEntity | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processGenerate(response: any): ng.IPromise<GeneratedCodeOfEntity | null> {
+    protected processGenerate(response: HttpResponseBase): Observable<GeneratedCodeOfEntity | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? GeneratedCodeOfEntity.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<GeneratedCodeOfEntity | null>(<any>null);
+        return _observableOf<GeneratedCodeOfEntity | null>(<any>null);
     }
 
-    create(model: CreateType | null): ng.IPromise<Entity | null> {
+    create(model: CreateType | null): Observable<Entity | null> {
         let url_ = this.baseUrl + "/api/Entities";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(model);
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "POST",
-            data: content_,
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Content-Type": "application/json",
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processCreate(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processCreate(_response);
-            throw _response;
-        });
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(<any>response_);
+                } catch (e) {
+                    return <Observable<Entity | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Entity | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processCreate(response: any): ng.IPromise<Entity | null> {
+    protected processCreate(response: HttpResponseBase): Observable<Entity | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? Entity.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<Entity | null>(<any>null);
+        return _observableOf<Entity | null>(<any>null);
     }
 
-    addProperty(id: string, model: AddProperty | null): ng.IPromise<void> {
+    addProperty(id: string, model: AddProperty | null): Observable<void> {
         let url_ = this.baseUrl + "/api/Entities/{id}/properties";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -419,40 +504,49 @@ export class EntitiesClient {
 
         const content_ = JSON.stringify(model);
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "PUT",
-            data: content_,
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Content-Type": "application/json",
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processAddProperty(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processAddProperty(_response);
-            throw _response;
-        });
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddProperty(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddProperty(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processAddProperty(response: any): ng.IPromise<void> {
+    protected processAddProperty(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 
-    removeProperty(id: string, name: string | null): ng.IPromise<void> {
+    removeProperty(id: string, name: string | null): Observable<void> {
         let url_ = this.baseUrl + "/api/Entities/{id}/properties/{name}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -462,38 +556,47 @@ export class EntitiesClient {
         url_ = url_.replace("{name}", encodeURIComponent("" + name));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "DELETE",
-            transformResponse: [],
-            headers: {
-            }
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processRemoveProperty(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processRemoveProperty(_response);
-            throw _response;
-        });
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemoveProperty(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemoveProperty(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processRemoveProperty(response: any): ng.IPromise<void> {
+    protected processRemoveProperty(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 
-    addDomainEvent(id: string, model: AddDomainEvent | null): ng.IPromise<void> {
+    addDomainEvent(id: string, model: AddDomainEvent | null): Observable<void> {
         let url_ = this.baseUrl + "/api/Entities/{id}/domainEvents";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -502,40 +605,49 @@ export class EntitiesClient {
 
         const content_ = JSON.stringify(model);
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "PUT",
-            data: content_,
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Content-Type": "application/json",
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processAddDomainEvent(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processAddDomainEvent(_response);
-            throw _response;
-        });
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddDomainEvent(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddDomainEvent(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processAddDomainEvent(response: any): ng.IPromise<void> {
+    protected processAddDomainEvent(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 
-    addRelation(id: string, model: AddRelation | null): ng.IPromise<void> {
+    addRelation(id: string, model: AddRelation | null): Observable<void> {
         let url_ = this.baseUrl + "/api/Entities/{id}/relations";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -544,40 +656,49 @@ export class EntitiesClient {
 
         const content_ = JSON.stringify(model);
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "PUT",
-            data: content_,
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Content-Type": "application/json",
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processAddRelation(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processAddRelation(_response);
-            throw _response;
-        });
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddRelation(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddRelation(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processAddRelation(response: any): ng.IPromise<void> {
+    protected processAddRelation(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 
-    removeRelation(id: string, name: string | null): ng.IPromise<void> {
+    removeRelation(id: string, name: string | null): Observable<void> {
         let url_ = this.baseUrl + "/api/Entities/{id}/relations/{name}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -587,78 +708,93 @@ export class EntitiesClient {
         url_ = url_.replace("{name}", encodeURIComponent("" + name));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "DELETE",
-            transformResponse: [],
-            headers: {
-            }
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processRemoveRelation(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processRemoveRelation(_response);
-            throw _response;
-        });
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemoveRelation(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemoveRelation(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processRemoveRelation(response: any): ng.IPromise<void> {
+    protected processRemoveRelation(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 }
 
+@Injectable()
 export class ModulesClient {
-    private baseUrl: string | undefined = undefined;
-    private http: ng.IHttpService;
-    private q: ng.IQService;
+    private http: HttpClient;
+    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor($http: ng.IHttpService, $q: ng.IQService, baseUrl?: string) {
-        this.http = $http;
-        this.q = $q;
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    get(): ng.IPromise<Module[] | null> {
+    get(): Observable<Module[] | null> {
         let url_ = this.baseUrl + "/api/Modules";
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "GET",
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processGet(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processGet(_response);
-            throw _response;
-        });
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(<any>response_);
+                } catch (e) {
+                    return <Observable<Module[] | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Module[] | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processGet(response: any): ng.IPromise<Module[] | null> {
+    protected processGet(response: HttpResponseBase): Observable<Module[] | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             if (Array.isArray(resultData200)) {
@@ -666,58 +802,69 @@ export class ModulesClient {
                 for (let item of resultData200)
                     result200!.push(Module.fromJS(item));
             }
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<Module[] | null>(<any>null);
+        return _observableOf<Module[] | null>(<any>null);
     }
 
-    create(model: CreateModule | null): ng.IPromise<Module | null> {
+    create(model: CreateModule | null): Observable<Module | null> {
         let url_ = this.baseUrl + "/api/Modules";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(model);
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "POST",
-            data: content_,
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Content-Type": "application/json",
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processCreate(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processCreate(_response);
-            throw _response;
-        });
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(<any>response_);
+                } catch (e) {
+                    return <Observable<Module | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Module | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processCreate(response: any): ng.IPromise<Module | null> {
+    protected processCreate(response: HttpResponseBase): Observable<Module | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? Module.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<Module | null>(<any>null);
+        return _observableOf<Module | null>(<any>null);
     }
 
-    generate(id: string, templateId: string): ng.IPromise<GeneratedCodeOfModule | null> {
+    generate(id: string, templateId: string): Observable<GeneratedCodeOfModule | null> {
         let url_ = this.baseUrl + "/api/Modules/{id}/generate/{templateId}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -727,93 +874,110 @@ export class ModulesClient {
         url_ = url_.replace("{templateId}", encodeURIComponent("" + templateId));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "GET",
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processGenerate(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processGenerate(_response);
-            throw _response;
-        });
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGenerate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGenerate(<any>response_);
+                } catch (e) {
+                    return <Observable<GeneratedCodeOfModule | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<GeneratedCodeOfModule | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processGenerate(response: any): ng.IPromise<GeneratedCodeOfModule | null> {
+    protected processGenerate(response: HttpResponseBase): Observable<GeneratedCodeOfModule | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? GeneratedCodeOfModule.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<GeneratedCodeOfModule | null>(<any>null);
+        return _observableOf<GeneratedCodeOfModule | null>(<any>null);
     }
 
-    delete(id: string): ng.IPromise<void> {
+    delete(id: string): Observable<void> {
         let url_ = this.baseUrl + "/api/Modules/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "DELETE",
-            transformResponse: [],
-            headers: {
-            }
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processDelete(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processDelete(_response);
-            throw _response;
-        });
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processDelete(response: any): ng.IPromise<void> {
+    protected processDelete(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 }
 
+@Injectable()
 export class TemplatesClient {
-    private baseUrl: string | undefined = undefined;
-    private http: ng.IHttpService;
-    private q: ng.IQService;
+    private http: HttpClient;
+    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor($http: ng.IHttpService, $q: ng.IQService, baseUrl?: string) {
-        this.http = $http;
-        this.q = $q;
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    getByMetaType(metaType: MetaType): ng.IPromise<Template[] | null> {
+    getByMetaType(metaType: MetaType): Observable<Template[] | null> {
         let url_ = this.baseUrl + "/api/Templates?";
         if (metaType === undefined || metaType === null)
             throw new Error("The parameter 'metaType' must be defined and cannot be null.");
@@ -821,30 +985,37 @@ export class TemplatesClient {
             url_ += "metaType=" + encodeURIComponent("" + metaType) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "GET",
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processGetByMetaType(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processGetByMetaType(_response);
-            throw _response;
-        });
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByMetaType(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByMetaType(<any>response_);
+                } catch (e) {
+                    return <Observable<Template[] | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Template[] | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processGetByMetaType(response: any): ng.IPromise<Template[] | null> {
+    protected processGetByMetaType(response: HttpResponseBase): Observable<Template[] | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             if (Array.isArray(resultData200)) {
@@ -852,100 +1023,120 @@ export class TemplatesClient {
                 for (let item of resultData200)
                     result200!.push(Template.fromJS(item));
             }
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<Template[] | null>(<any>null);
+        return _observableOf<Template[] | null>(<any>null);
     }
 
-    create(model: CreateTemplate | null): ng.IPromise<Template | null> {
+    create(model: CreateTemplate | null): Observable<Template | null> {
         let url_ = this.baseUrl + "/api/Templates";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(model);
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "POST",
-            data: content_,
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Content-Type": "application/json",
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processCreate(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processCreate(_response);
-            throw _response;
-        });
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(<any>response_);
+                } catch (e) {
+                    return <Observable<Template | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Template | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processCreate(response: any): ng.IPromise<Template | null> {
+    protected processCreate(response: HttpResponseBase): Observable<Template | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? Template.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<Template | null>(<any>null);
+        return _observableOf<Template | null>(<any>null);
     }
 
-    getById(id: string): ng.IPromise<Template | null> {
+    getById(id: string): Observable<Template | null> {
         let url_ = this.baseUrl + "/api/Templates/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "GET",
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processGetById(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processGetById(_response);
-            throw _response;
-        });
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(<any>response_);
+                } catch (e) {
+                    return <Observable<Template | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Template | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processGetById(response: any): ng.IPromise<Template | null> {
+    protected processGetById(response: HttpResponseBase): Observable<Template | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? Template.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<Template | null>(<any>null);
+        return _observableOf<Template | null>(<any>null);
     }
 
-    update(id: string, model: UpdateTemplate | null): ng.IPromise<Template | null> {
+    update(id: string, model: UpdateTemplate | null): Observable<Template | null> {
         let url_ = this.baseUrl + "/api/Templates/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -954,175 +1145,210 @@ export class TemplatesClient {
 
         const content_ = JSON.stringify(model);
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "PUT",
-            data: content_,
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Content-Type": "application/json",
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processUpdate(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processUpdate(_response);
-            throw _response;
-        });
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(<any>response_);
+                } catch (e) {
+                    return <Observable<Template | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Template | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processUpdate(response: any): ng.IPromise<Template | null> {
+    protected processUpdate(response: HttpResponseBase): Observable<Template | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? Template.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<Template | null>(<any>null);
+        return _observableOf<Template | null>(<any>null);
     }
 
-    delete(id: string): ng.IPromise<void> {
+    delete(id: string): Observable<void> {
         let url_ = this.baseUrl + "/api/Templates/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "DELETE",
-            transformResponse: [],
-            headers: {
-            }
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processDelete(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processDelete(_response);
-            throw _response;
-        });
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processDelete(response: any): ng.IPromise<void> {
+    protected processDelete(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 }
 
+@Injectable()
 export class ValueObjectsClient {
-    private baseUrl: string | undefined = undefined;
-    private http: ng.IHttpService;
-    private q: ng.IQService;
+    private http: HttpClient;
+    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor($http: ng.IHttpService, $q: ng.IQService, baseUrl?: string) {
-        this.http = $http;
-        this.q = $q;
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    getDetails(id: string): ng.IPromise<ValueObjectDetails | null> {
+    getDetails(id: string): Observable<ValueObjectDetails | null> {
         let url_ = this.baseUrl + "/api/ValueObjects/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "GET",
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processGetDetails(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processGetDetails(_response);
-            throw _response;
-        });
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDetails(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDetails(<any>response_);
+                } catch (e) {
+                    return <Observable<ValueObjectDetails | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ValueObjectDetails | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processGetDetails(response: any): ng.IPromise<ValueObjectDetails | null> {
+    protected processGetDetails(response: HttpResponseBase): Observable<ValueObjectDetails | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? ValueObjectDetails.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<ValueObjectDetails | null>(<any>null);
+        return _observableOf<ValueObjectDetails | null>(<any>null);
     }
 
-    delete(id: string): ng.IPromise<void> {
+    delete(id: string): Observable<void> {
         let url_ = this.baseUrl + "/api/ValueObjects/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "DELETE",
-            transformResponse: [],
-            headers: {
-            }
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processDelete(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processDelete(_response);
-            throw _response;
-        });
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processDelete(response: any): ng.IPromise<void> {
+    protected processDelete(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 
-    generate(id: string, templateId: string): ng.IPromise<GeneratedCodeOfValueObject | null> {
+    generate(id: string, templateId: string): Observable<GeneratedCodeOfValueObject | null> {
         let url_ = this.baseUrl + "/api/ValueObjects/{id}/generate/{templateId}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -1132,85 +1358,103 @@ export class ValueObjectsClient {
         url_ = url_.replace("{templateId}", encodeURIComponent("" + templateId));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "GET",
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processGenerate(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processGenerate(_response);
-            throw _response;
-        });
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGenerate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGenerate(<any>response_);
+                } catch (e) {
+                    return <Observable<GeneratedCodeOfValueObject | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<GeneratedCodeOfValueObject | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processGenerate(response: any): ng.IPromise<GeneratedCodeOfValueObject | null> {
+    protected processGenerate(response: HttpResponseBase): Observable<GeneratedCodeOfValueObject | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? GeneratedCodeOfValueObject.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<GeneratedCodeOfValueObject | null>(<any>null);
+        return _observableOf<GeneratedCodeOfValueObject | null>(<any>null);
     }
 
-    create(model: CreateType | null): ng.IPromise<ValueObject | null> {
+    create(model: CreateType | null): Observable<ValueObject | null> {
         let url_ = this.baseUrl + "/api/ValueObjects";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(model);
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "POST",
-            data: content_,
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Content-Type": "application/json",
                 "Accept": "application/json"
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processCreate(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processCreate(_response);
-            throw _response;
-        });
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(<any>response_);
+                } catch (e) {
+                    return <Observable<ValueObject | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ValueObject | null>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processCreate(response: any): ng.IPromise<ValueObject | null> {
+    protected processCreate(response: HttpResponseBase): Observable<ValueObject | null> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? ValueObject.fromJS(resultData200) : <any>null;
-            return this.q.resolve(result200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<ValueObject | null>(<any>null);
+        return _observableOf<ValueObject | null>(<any>null);
     }
 
-    addProperty(id: string, model: AddProperty | null): ng.IPromise<void> {
+    addProperty(id: string, model: AddProperty | null): Observable<void> {
         let url_ = this.baseUrl + "/api/ValueObjects/{id}/properties";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -1219,40 +1463,49 @@ export class ValueObjectsClient {
 
         const content_ = JSON.stringify(model);
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "PUT",
-            data: content_,
-            transformResponse: [],
-            headers: {
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
                 "Content-Type": "application/json",
-            }
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processAddProperty(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processAddProperty(_response);
-            throw _response;
-        });
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddProperty(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddProperty(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processAddProperty(response: any): ng.IPromise<void> {
+    protected processAddProperty(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 
-    removeProperty(id: string, name: string | null): ng.IPromise<void> {
+    removeProperty(id: string, name: string | null): Observable<void> {
         let url_ = this.baseUrl + "/api/ValueObjects/{id}/properties/{name}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -1262,35 +1515,44 @@ export class ValueObjectsClient {
         url_ = url_.replace("{name}", encodeURIComponent("" + name));
         url_ = url_.replace(/[?&]$/, "");
 
-        var options_ = <ng.IRequestConfig>{
-            url: url_,
-            method: "DELETE",
-            transformResponse: [],
-            headers: {
-            }
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
         };
 
-        return this.http(options_).then((_response) => {
-            return this.processRemoveProperty(_response);
-        }, (_response) => {
-            if (_response.status)
-                return this.processRemoveProperty(_response);
-            throw _response;
-        });
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemoveProperty(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemoveProperty(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
     }
 
-    protected processRemoveProperty(response: any): ng.IPromise<void> {
+    protected processRemoveProperty(response: HttpResponseBase): Observable<void> {
         const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-        let _headers: any = {};
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
-            const _responseText = response.data;
-            return this.q.resolve<void>(<any>null);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException(this.q, "An unexpected server error occurred.", status, _responseText, _headers);
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
-        return this.q.resolve<void>(<any>null);
+        return _observableOf<void>(<any>null);
     }
 }
 
@@ -2322,17 +2584,27 @@ export class ApiException extends Error {
     }
 }
 
-function throwException(q: ng.IQService, message: string, status: number, response: string, headers: { [key: string]: any; }, result?: any): ng.IPromise<any> {
+function throwException(message: string, status: number, response: string, headers: { [key: string]: any; }, result?: any): Observable<any> {
     if (result !== null && result !== undefined)
-        return q.reject(result);
+        return _observableThrow(result);
     else
-        return q.reject(new ApiException(message, status, response, headers, null));
+        return _observableThrow(new ApiException(message, status, response, headers, null));
 }
 
-function blobToText(blob: Blob, q: ng.IQService): ng.IPromise<string> {
-    return new q((resolve) => {
-        let reader = new FileReader();
-        reader.onload = event => resolve((<any>event.target).result);
-        reader.readAsText(blob);
+function blobToText(blob: any): Observable<string> {
+    return new Observable<string>((observer: any) => {
+        if (!blob) {
+            observer.next("");
+            observer.complete();
+        } else {
+            let reader = new FileReader();
+            reader.onload = event => {
+                observer.next((<any>event.target).result);
+                observer.complete();
+            };
+            reader.readAsText(blob);
+        }
     });
+}
+
 }

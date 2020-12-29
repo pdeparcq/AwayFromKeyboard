@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AwayFromKeyboard.Api", "AwayFromKeyboard.Api\AwayFromKeyboard.Api.csproj", "{CA1FEA21-75E0-4BE9-B74C-67712DB520C8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AwayFromKeyboard.App", "AwayFromKeyboard.App\AwayFromKeyboard.App.csproj", "{8A38860F-93D1-4335-A0A0-A5A4452A433A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{CA1FEA21-75E0-4BE9-B74C-67712DB520C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA1FEA21-75E0-4BE9-B74C-67712DB520C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA1FEA21-75E0-4BE9-B74C-67712DB520C8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8A38860F-93D1-4335-A0A0-A5A4452A433A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8A38860F-93D1-4335-A0A0-A5A4452A433A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8A38860F-93D1-4335-A0A0-A5A4452A433A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8A38860F-93D1-4335-A0A0-A5A4452A433A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

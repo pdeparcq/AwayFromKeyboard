@@ -62,15 +62,15 @@
   "codeGenerators": {
     "openApiToTypeScriptClient": {
       "className": "{controller}Client",
-      "moduleName": "",
+      "moduleName": "afk",
       "namespace": "",
       "typeScriptVersion": 2.7,
-      "template": "AngularJS",
+      "template": "Angular",
       "promiseType": "Promise",
       "httpClass": "HttpClient",
       "withCredentials": false,
       "useSingletonProvider": false,
-      "injectionTokenType": "OpaqueToken",
+      "injectionTokenType": "InjectionToken",
       "rxJsVersion": 6.0,
       "dateTimeType": "Date",
       "nullValue": "Undefined",
