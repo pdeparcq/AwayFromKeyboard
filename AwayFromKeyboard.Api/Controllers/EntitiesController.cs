@@ -7,6 +7,7 @@ using AwayFromKeyboard.Api.Services;
 using AwayFromKeyboard.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PlantUml.Net;
 using DomainEvent = AwayFromKeyboard.Api.Domain.Meta.DomainEvent;
 using Entity = AwayFromKeyboard.Api.ViewModels.Entity;
 using EntityRelation = AwayFromKeyboard.Api.Domain.Meta.EntityRelation;
@@ -53,6 +54,24 @@ namespace AwayFromKeyboard.Api.Controllers
                 Template = _mapper.Map<Template>(template),
                 Value = _generator.GenerateCode(template, entity)
             };
+        }
+
+        [HttpGet("{id}/generate/{templateId}/uml")]
+        public async Task<IActionResult> GenerateUmlDiagram(Guid id, Guid templateId)
+        {
+            // Get model
+            var entity = await GetEntity(id);
+
+            // Get template
+            var template = await _codeGenDbContext.Templates.FindAsync(templateId);
+
+            // Generate and return uml diagram
+            var bytes = await new RendererFactory().CreateRenderer(new PlantUmlSettings
+            {
+                RenderingMode = RenderingMode.Remote
+            }).RenderAsync(_generator.GenerateCode(template, entity), OutputFormat.Png);
+
+            return File(bytes, "image/png");
         }
 
         [HttpPost]
